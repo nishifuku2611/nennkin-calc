@@ -92,4 +92,118 @@ table td {
 <div style="display:flex; gap:10px;">
   <button class="big-button" onclick="calculate()">計算する</button>
   <button class="big-button" onclick="clearInput()">クリア</button>
-</
+</div>
+
+<div id="result">
+  所得金額は <span id="amount"></span> 円です。
+</div>
+
+<script>
+
+function calculate() {
+
+  const income =
+    parseInt(document.getElementById("income").value.replace(/,/g, ""));
+
+  if (isNaN(income)) {
+    document.getElementById("amount").innerText = "";
+    return;
+  }
+
+  const ageValue =
+    document.querySelector('input[name="ageKubun"]:checked').value;
+
+  const isOver65 = (ageValue === "over65");
+
+  let deduction = 0;
+
+  // 公的年金等控除額
+  if (isOver65) {
+
+    // 65歳以上
+    if (income <= 3300000) {
+      deduction = 1100000;
+
+    } else if (income <= 4100000) {
+      deduction = income * 0.25 + 275000;
+
+    } else if (income <= 7700000) {
+      deduction = income * 0.15 + 685000;
+
+    } else if (income <= 10000000) {
+      deduction = income * 0.05 + 1455000;
+
+    } else {
+      deduction = 1955000;
+    }
+
+  } else {
+
+    // 65歳未満
+    if (income <= 1300000) {
+      deduction = 600000;
+
+    } else if (income <= 4100000) {
+      deduction = income * 0.25 + 275000;
+
+    } else if (income <= 7700000) {
+      deduction = income * 0.15 + 685000;
+
+    } else if (income <= 10000000) {
+      deduction = income * 0.05 + 1455000;
+
+    } else {
+      deduction = 1955000;
+    }
+
+  }
+
+  // 所得金額
+  const result = Math.max(
+    Math.floor(income - deduction),
+    0
+  );
+
+  document.getElementById("amount").innerText =
+    result.toLocaleString();
+
+}
+
+function clearInput() {
+  document.getElementById("income").value = "";
+  document.getElementById("amount").innerText = "";
+}
+
+// 入力時にカンマ編集
+const incomeInput = document.getElementById("income");
+
+incomeInput.addEventListener("input", function(e) {
+
+  const input = e.target;
+  const selectionStart = input.selectionStart;
+
+  let raw = input.value.replace(/,/g, "");
+  raw = raw.replace(/\D/g, "");
+
+  if (raw === "") {
+    input.value = "";
+    return;
+  }
+
+  const formatted = Number(raw).toLocaleString();
+
+  input.value = formatted;
+
+  const diff = formatted.length - raw.length;
+
+  input.setSelectionRange(
+    selectionStart + diff,
+    selectionStart + diff
+  );
+
+});
+
+</script>
+
+</body>
+</html>
